@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Countdown Timer</title>
+    
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px 60px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 5px;
+        }
+
+        h2 {
+            color: #7f8c8d;
+            font-weight: 300;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        .timer {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+        }
+
+        .time-box {
+            background-color: #3498db;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            min-width: 70px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+        }
+
+        .time-box p {
+            font-size: 2em; /* Slightly reduced for better fit */
+            font-weight: bold;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 0.7em; /* Slightly reduced for better fit */
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .message {
+            font-size: 1.4em;
+            color: #2ecc71;
+            font-weight: bold;
+            padding: 20px;
+            border: 3px dashed #2ecc71;
+            border-radius: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎁 New Year Gift Countdown 🎁</h1>
+        <h2>Target Date: January 1, 2026</h2>
+        
+        <div id="countdown" class="timer">
+            <div class="time-box">
+                <p id="days">00</p>
+                <span>Days</span>
+            </div>
+            <div class="time-box">
+                <p id="hours">00</p>
+                <span>Hours</span>
+            </div>
+            <div class="time-box">
+                <p id="minutes">00</p>
+                <span>Minutes</span>
+            </div>
+            <div class="time-box">
+                <p id="seconds">00</p>
+                <span>Seconds</span>
+            </div>
+        </div>
+
+        <div id="message" class="message hidden">
+            <p>🎉 **TIME'S UP! Your gift is enabled!** 🎉</p>
+        </div>
+    </div>
+
+    <script>
+        // Set the date we're counting down to: January 1, 2026, at 00:00:00 local time
+        const countDownDate = new Date("Jan 1, 2026 00:00:00").getTime();
+
+        // Get the elements to update
+        const countdownEl = document.getElementById("countdown");
+        const messageEl = document.getElementById("message");
+
+        const daysEl = document.getElementById("days");
+        const hoursEl = document.getElementById("hours");
+        const minutesEl = document.getElementById("minutes");
+        const secondsEl = document.getElementById("seconds");
+
+        /**
+         * Helper function to ensure numbers have a leading zero if they are less than 10.
+         */
+        function formatTime(time) {
+            return time < 10 ? '0' + time : time;
+        }
+
+        // Function to run the countdown logic
+        function updateCountdown() {
+            // Get today's date and time
+            const now = new Date().getTime();
+
+            // Find the distance between now and the countdown date
+            const distance = countDownDate - now;
+
+            // Time calculations for days, hours, minutes, and seconds
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // If the countdown is finished (distance is negative or zero)
+            if (distance <= 0) {
+                clearInterval(x); // Stop the timer
+                countdownEl.classList.add("hidden"); // Hide the timer
+                messageEl.classList.remove("hidden"); // Show the message
+                
+                // Ensure display is 00:00:00 if it ran slightly past
+                daysEl.innerHTML = "00";
+                hoursEl.innerHTML = "00";
+                minutesEl.innerHTML = "00";
+                secondsEl.innerHTML = "00";
+                return; // Exit the function
+            }
+
+            // Display the result in the corresponding elements
+            daysEl.innerHTML = formatTime(days);
+            hoursEl.innerHTML = formatTime(hours);
+            minutesEl.innerHTML = formatTime(minutes);
+            secondsEl.innerHTML = formatTime(seconds);
+        }
+
+        // Run the function once immediately to avoid a 1-second delay at start
+        updateCountdown();
+
+        // Update the countdown every 1 second
+        const x = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
