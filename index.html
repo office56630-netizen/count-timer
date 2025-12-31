@@ -7,7 +7,7 @@
     
     <style>
         body {
-            font-family: sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f9;
             color: #333;
             display: flex;
@@ -39,12 +39,13 @@
             margin-bottom: 30px;
         }
 
+        /* Timer Boxes */
         .timer {
             display: flex;
             gap: 15px;
             justify-content: center;
             margin-bottom: 30px;
-            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+            flex-wrap: wrap;
         }
 
         .time-box {
@@ -58,7 +59,7 @@
         }
 
         .time-box p {
-            font-size: 2em; /* Slightly reduced for better fit */
+            font-size: 2em;
             font-weight: bold;
             margin: 0;
             line-height: 1;
@@ -66,11 +67,12 @@
 
         .time-box span {
             display: block;
-            font-size: 0.7em; /* Slightly reduced for better fit */
+            font-size: 0.7em;
             text-transform: uppercase;
             margin-top: 5px;
         }
 
+        /* Message & Gift Area */
         .message {
             font-size: 1.4em;
             color: #2ecc71;
@@ -80,8 +82,80 @@
             border-radius: 10px;
         }
 
+        /* Gift Box CSS */
+        .gift-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 150px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .gift-box-wrapper {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            background: #e74c3c;
+            border-radius: 5px;
+            transition: all 0.5s ease;
+        }
+
+        /* Ribbon */
+        .gift-box-wrapper::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: #f1c40f;
+            left: 40px;
+            z-index: 1;
+        }
+
+        .gift-box-wrapper::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 20px;
+            background: #f1c40f;
+            top: 40px;
+            z-index: 1;
+        }
+
+        .lid {
+            position: absolute;
+            width: 110px;
+            height: 20px;
+            background: #c0392b;
+            top: -15px;
+            left: -5px;
+            z-index: 3;
+            border-radius: 3px;
+            transition: all 0.5s ease;
+        }
+
+        /* Animation Classes */
+        .open-animation .lid {
+            transform: translateY(-50px) rotate(-15deg);
+            opacity: 0;
+        }
+
+        .open-animation {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+        }
+
         .hidden {
             display: none;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .message:not(.hidden) .gift-box-wrapper {
+            animation: bounce 2s infinite;
         }
     </style>
 </head>
@@ -89,7 +163,7 @@
 
     <div class="container">
         <h1>🎁 New Year Gift Countdown 🎁</h1>
-        <h2>Time remaining until the gift is enabled:</h2>
+        <h2 id="subtitle">Time remaining until the gift is enabled:</h2>
         
         <div id="countdown" class="timer">
             <div class="time-box">
@@ -111,71 +185,65 @@
         </div>
 
         <div id="message" class="message hidden">
-            <p>🎉 **TIME'S UP! Your gift is enabled!** 🎉</p>
+            <p>🎉 TIME'S UP! 🎉</p>
+            <p style="font-size: 0.8em; color: #7f8c8d;">Click the box to claim your gift</p>
+            
+            <div class="gift-container" onclick="openGift()">
+                <div id="giftWrapper" class="gift-box-wrapper">
+                    <div class="lid"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Set the date we're counting down to: January 1, 2026, at 00:00:00 local time
+        // TARGET DATE: Jan 1, 2026
         const countDownDate = new Date("Jan 1, 2026 00:00:00").getTime();
 
-        // Get the elements to update
         const countdownEl = document.getElementById("countdown");
         const messageEl = document.getElementById("message");
+        const subtitle = document.getElementById("subtitle");
 
-        const daysEl = document.getElementById("days");
-        const hoursEl = document.getElementById("hours");
-        const minutesEl = document.getElementById("minutes");
-        const secondsEl = document.getElementById("seconds");
-
-        /**
-         * Helper function to ensure numbers have a leading zero if they are less than 10.
-         */
         function formatTime(time) {
             return time < 10 ? '0' + time : time;
         }
 
-        // Function to run the countdown logic
         function updateCountdown() {
-            // Get today's date and time
             const now = new Date().getTime();
-
-            // Find the distance between now and the countdown date
             const distance = countDownDate - now;
 
-            // Time calculations for days, hours, minutes, and seconds
+            if (distance <= 0) {
+                clearInterval(x);
+                countdownEl.classList.add("hidden");
+                subtitle.classList.add("hidden");
+                messageEl.classList.remove("hidden");
+                return;
+            }
+
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // If the countdown is finished (distance is negative or zero)
-            if (distance <= 0) {
-                clearInterval(x); // Stop the timer
-                countdownEl.classList.add("hidden"); // Hide the timer
-                messageEl.classList.remove("hidden"); // Show the message
-                
-                // Ensure display is 00:00:00 if it ran slightly past
-                daysEl.innerHTML = "00";
-                hoursEl.innerHTML = "00";
-                minutesEl.innerHTML = "00";
-                secondsEl.innerHTML = "00";
-                return; // Exit the function
-            }
-
-            // Display the result in the corresponding elements
-            daysEl.innerHTML = formatTime(days);
-            hoursEl.innerHTML = formatTime(hours);
-            minutesEl.innerHTML = formatTime(minutes);
-            secondsEl.innerHTML = formatTime(seconds);
+            document.getElementById("days").innerHTML = formatTime(days);
+            document.getElementById("hours").innerHTML = formatTime(hours);
+            document.getElementById("minutes").innerHTML = formatTime(minutes);
+            document.getElementById("seconds").innerHTML = formatTime(seconds);
         }
 
-        // Run the function once immediately to avoid a 1-second delay at start
-        updateCountdown();
+        // Action when gift is clicked
+        function openGift() {
+            const gift = document.getElementById("giftWrapper");
+            gift.classList.add("open-animation");
 
-        // Update the countdown every 1 second
+            // Wait for animation, then redirect
+            setTimeout(() => {
+                window.location.href = "https://youtubetr-001-trial.vercel.app/";
+            }, 800);
+        }
+
+        updateCountdown();
         const x = setInterval(updateCountdown, 1000);
     </script>
 </body>
-
 </html>
